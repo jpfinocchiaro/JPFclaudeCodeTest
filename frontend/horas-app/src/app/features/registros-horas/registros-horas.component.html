@@ -1,0 +1,75 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <a routerLink="/proyectos" class="back-link"><app-icon name="arrow-left" [size]="14"/> Proyectos</a>
+      <h2>
+        Horas — {{ proyecto()?.codigo }}
+        <small class="muted">{{ proyecto()?.descripcion }} · {{ proyecto()?.clienteNombre }}</small>
+      </h2>
+    </div>
+    <button class="btn primary" (click)="startNew()" [disabled]="editingId() !== null"><app-icon name="plus"/> Registrar horas</button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="error">{{ e }}</div>
+  }
+
+  @if (editingId() !== null) {
+    <form [formGroup]="form" (ngSubmit)="save()" class="card form">
+      <h3>{{ editingId() === 0 ? 'Nuevo registro' : 'Editar registro' }}</h3>
+      <div class="row">
+        <label>
+          Fecha
+          <input type="date" formControlName="fecha" />
+        </label>
+        <label>
+          Horas <small class="muted">(0.01 a 24, p. ej. 0.50 = media hora)</small>
+          <input type="number" step="0.01" min="0.01" max="24" formControlName="horas" />
+        </label>
+      </div>
+      <label>
+        Descripción
+        <textarea formControlName="descripcion" rows="2"></textarea>
+      </label>
+      <div class="actions">
+        <button type="submit" class="btn primary" [disabled]="form.invalid"><app-icon name="check"/> Guardar</button>
+        <button type="button" class="btn" (click)="cancel()"><app-icon name="x"/> Cancelar</button>
+      </div>
+    </form>
+  }
+
+  <div class="toolbar">
+    <div class="search">
+      <input type="text" placeholder="Buscar por fecha, horas o descripción..." [ngModel]="filtro()" (ngModelChange)="filtro.set($event)" />
+    </div>
+    <span class="count">{{ filtrados().length }} de {{ registros().length }}</span>
+  </div>
+
+  <table class="data">
+    <thead>
+      <tr>
+        <th>Fecha</th><th>Horas</th><th>Descripción</th><th class="actions-col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (r of filtrados(); track r.id) {
+        <tr>
+          <td>{{ r.fecha }}</td>
+          <td>{{ r.horas }}</td>
+          <td>{{ r.descripcion }}</td>
+          <td class="actions-col">
+            <button class="btn sm" (click)="startEdit(r)"><app-icon name="edit"/> Editar</button>
+            <button class="btn sm danger" (click)="remove(r)"><app-icon name="trash"/> Eliminar</button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="4" class="empty">{{ filtro() ? 'Sin resultados' : 'Sin registros' }}</td></tr>
+      }
+    </tbody>
+    @if (filtrados().length > 0) {
+      <tfoot>
+        <tr><th>Total</th><th>{{ totalFiltrado() }}</th><th colspan="2"></th></tr>
+      </tfoot>
+    }
+  </table>
+</section>

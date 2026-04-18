@@ -1,0 +1,36 @@
+# ===== .NET =====
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.pdb
+
+# ===== SQLite (local DB) =====
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# ===== Angular / Node =====
+node_modules/
+dist/
+.angular/
+*.log
+npm-debug.log*
+
+# ===== OS =====
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# ===== IDE =====
+.idea/
+.vscode/
+*.swp
+
+# ===== Env =====
+.env
+.env.local
+*.local

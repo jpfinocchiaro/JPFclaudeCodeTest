@@ -1,0 +1,76 @@
+<section class="page">
+  <header class="page-header">
+    <h2>Clientes</h2>
+    <button class="btn primary" (click)="startNew()" [disabled]="editingId() !== null"><app-icon name="plus"/> Nuevo</button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="error">{{ e }}</div>
+  }
+
+  @if (editingId() !== null) {
+    <form [formGroup]="form" (ngSubmit)="save()" class="card form">
+      <h3>{{ editingId() === 0 ? 'Nuevo cliente' : 'Editar cliente' }}</h3>
+      <label>
+        Nombre
+        <input type="text" formControlName="nombre" autofocus />
+      </label>
+      <div class="actions">
+        <button type="submit" class="btn primary" [disabled]="form.invalid"><app-icon name="check"/> Guardar</button>
+        <button type="button" class="btn" (click)="cancel()"><app-icon name="x"/> Cancelar</button>
+      </div>
+    </form>
+  }
+
+  <div class="toolbar">
+    <div class="search">
+      <input type="text" placeholder="Buscar..." [ngModel]="filtro()" (ngModelChange)="filtro.set($event)" />
+    </div>
+    <span class="count">{{ filtrados().length }} de {{ clientes().length }}</span>
+    <div class="view-toggle" style="margin-left:auto">
+      <button [class.active]="vista() === 'tarjetas'" (click)="vista.set('tarjetas')"><app-icon name="grid"/> Tarjetas</button>
+      <button [class.active]="vista() === 'tabla'" (click)="vista.set('tabla')"><app-icon name="list"/> Tabla</button>
+    </div>
+  </div>
+
+  @if (vista() === 'tarjetas') {
+    <div class="cards-grid">
+      @for (c of filtrados(); track c.id) {
+        <div class="entity-card">
+          <div class="card-head">
+            <span class="badge neutral">#{{ c.id }}</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">{{ c.nombre }}</h3>
+          </div>
+          <div class="card-actions">
+            <button class="btn sm" (click)="startEdit(c)"><app-icon name="edit"/> Editar</button>
+            <button class="btn sm danger" (click)="remove(c)"><app-icon name="trash"/> Eliminar</button>
+          </div>
+        </div>
+      } @empty {
+        <div class="cards-empty">{{ filtro() ? 'Sin resultados' : 'Sin clientes' }}</div>
+      }
+    </div>
+  } @else {
+    <table class="data">
+      <thead>
+        <tr><th>ID</th><th>Nombre</th><th class="actions-col">Acciones</th></tr>
+      </thead>
+      <tbody>
+        @for (c of filtrados(); track c.id) {
+          <tr>
+            <td>{{ c.id }}</td>
+            <td>{{ c.nombre }}</td>
+            <td class="actions-col">
+              <button class="btn sm" (click)="startEdit(c)"><app-icon name="edit"/> Editar</button>
+              <button class="btn sm danger" (click)="remove(c)"><app-icon name="trash"/> Eliminar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="3" class="empty">{{ filtro() ? 'Sin resultados' : 'Sin clientes' }}</td></tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

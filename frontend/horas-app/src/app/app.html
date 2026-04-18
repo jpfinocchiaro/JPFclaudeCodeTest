@@ -1,0 +1,14 @@
+<header class="app-header">
+  <h1><app-icon name="clock" [size]="22"/> {{ title }}</h1>
+  <nav>
+    <a routerLink="/proyectos" routerLinkActive="active"><app-icon name="folder"/> Proyectos</a>
+    <a routerLink="/horas" routerLinkActive="active"><app-icon name="clock"/> Horas</a>
+    <a routerLink="/clientes" routerLinkActive="active"><app-icon name="users"/> Clientes</a>
+    <button type="button" class="nav-exit" (click)="salir()" title="Salir del sistema">
+      <app-icon name="log-out"/> Salir
+    </button>
+  </nav>
+</header>
+<main>
+  <router-outlet />
+</main>
