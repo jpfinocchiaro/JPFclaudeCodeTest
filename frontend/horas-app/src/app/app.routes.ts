@@ -23,6 +23,11 @@ export const routes: Routes = [
       import('./features/registros-horas/registros-horas.component').then(m => m.RegistrosHorasComponent)
   },
   {
+    path: 'reportes/horas-por-proyecto',
+    loadComponent: () =>
+      import('./features/reportes/horas-por-proyecto.component').then(m => m.HorasPorProyectoComponent)
+  },
+  {
     path: 'salir',
     loadComponent: () =>
       import('./features/salir/salir.component').then(m => m.SalirComponent)

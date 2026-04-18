@@ -1,0 +1,149 @@
+<section class="page">
+  <header class="page-header">
+    <h2><app-icon name="bar-chart" [size]="22"/> Reporte de horas por proyecto</h2>
+  </header>
+
+  @if (error(); as e) {
+    <div class="error">{{ e }}</div>
+  }
+
+  <form class="card form filtros" (ngSubmit)="generar()">
+    <h3><app-icon name="filter" [size]="16"/> Filtros</h3>
+
+    <div class="grid">
+      <label>
+        Desde
+        <input type="date" [ngModel]="desde()" (ngModelChange)="desde.set($event); mesSeleccionado.set('')" name="desde" />
+      </label>
+      <label>
+        Hasta
+        <input type="date" [ngModel]="hasta()" (ngModelChange)="hasta.set($event); mesSeleccionado.set('')" name="hasta" />
+      </label>
+      <label>
+        Mes completo
+        <input type="month" [ngModel]="mesSeleccionado()" (ngModelChange)="onMesChange($event)" name="mes" />
+      </label>
+      <label>
+        Cliente
+        <select [ngModel]="clienteId() ?? ''" (ngModelChange)="onClienteChange($event)" name="cliente">
+          <option value="">-- Todos --</option>
+          @for (c of clientes(); track c.id) {
+            <option [value]="c.id">{{ c.nombre }}</option>
+          }
+        </select>
+      </label>
+      <label class="span-2">
+        Proyecto
+        <select [ngModel]="proyectoId() ?? ''" (ngModelChange)="onProyectoChange($event)" name="proyecto">
+          <option value="">-- Todos --</option>
+          @for (p of proyectosFiltrados(); track p.id) {
+            <option [value]="p.id">{{ p.codigo }} — {{ p.descripcion }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn primary" [disabled]="cargando()">
+        <app-icon name="bar-chart"/> Ver en pantalla
+      </button>
+      <button type="button" class="btn" (click)="exportar('excel')" [disabled]="cargando()">
+        <app-icon name="file-spreadsheet"/> Exportar Excel
+      </button>
+      <button type="button" class="btn" (click)="exportar('pdf')" [disabled]="cargando()">
+        <app-icon name="file-text"/> Exportar PDF
+      </button>
+      <button type="button" class="btn" (click)="limpiar()" [disabled]="cargando()">
+        <app-icon name="x"/> Limpiar
+      </button>
+    </div>
+  </form>
+
+  @if (reporte(); as r) {
+    <div class="toolbar">
+      <div class="view-toggle">
+        <button type="button" [class.active]="vista() === 'resumen'" (click)="vista.set('resumen')">
+          <app-icon name="grid"/> Resumen por proyecto
+        </button>
+        <button type="button" [class.active]="vista() === 'detalle'" (click)="vista.set('detalle')">
+          <app-icon name="list"/> Detalle de registros
+        </button>
+      </div>
+      <span class="count">
+        {{ r.items.length }} registro(s) · Total {{ r.totalHoras | number:'1.2-2' }} h
+      </span>
+    </div>
+
+    @if (vista() === 'resumen') {
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Proyecto</th>
+            <th>Cliente</th>
+            <th class="num">Registros</th>
+            <th class="num">Total horas</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of r.resumenPorProyecto; track s.proyectoId) {
+            <tr>
+              <td>{{ s.proyectoCodigo }}</td>
+              <td>{{ s.proyectoDescripcion }}</td>
+              <td>{{ s.clienteNombre }}</td>
+              <td class="num">{{ s.cantidadRegistros }}</td>
+              <td class="num">{{ s.totalHoras | number:'1.2-2' }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="empty">Sin horas en el período seleccionado</td></tr>
+          }
+        </tbody>
+        @if (r.resumenPorProyecto.length > 0) {
+          <tfoot>
+            <tr>
+              <th colspan="3" class="num">Total</th>
+              <th class="num">{{ r.items.length }}</th>
+              <th class="num">{{ r.totalHoras | number:'1.2-2' }}</th>
+            </tr>
+          </tfoot>
+        }
+      </table>
+    } @else {
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Proyecto</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th class="num">Horas</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (it of r.items; track it.registroId) {
+            <tr>
+              <td>{{ it.proyectoCodigo }}</td>
+              <td>{{ it.proyectoDescripcion }}</td>
+              <td>{{ it.clienteNombre }}</td>
+              <td>{{ it.fecha }}</td>
+              <td class="num">{{ it.horas | number:'1.2-2' }}</td>
+              <td>{{ it.descripcion }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="empty">Sin registros en el período seleccionado</td></tr>
+          }
+        </tbody>
+        @if (r.items.length > 0) {
+          <tfoot>
+            <tr>
+              <th colspan="4" class="num">Total</th>
+              <th class="num">{{ r.totalHoras | number:'1.2-2' }}</th>
+              <th></th>
+            </tr>
+          </tfoot>
+        }
+      </table>
+    }
+  }
+</section>
